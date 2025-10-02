@@ -14,7 +14,6 @@ def split_multi_tuple_insert(statement: str):
     columns_part = statement[:idx_values].strip()
     values_part = statement[idx_values + len('values'):].strip().rstrip(';')
 
-    # Add promotion columns
     if '(' in columns_part and ')' in columns_part:
         start = columns_part.find('(')
         end = columns_part.rfind(')')
@@ -27,7 +26,6 @@ def split_multi_tuple_insert(statement: str):
     else:
         columns_part += ' (promotionid, promotionname)'
 
-    # Split the VALUES clause into individual tuples
     tuples = []
     buf = ''
     paren_level = 0
@@ -47,17 +45,14 @@ def split_multi_tuple_insert(statement: str):
             elif c == ')':
                 paren_level -= 1
                 if paren_level == 0:
-                    # End of tuple
-                    buf = buf[:-1] + ', NULL, NULL)'  # append promotion fields
+                    buf = buf[:-1] + ', NULL, NULL)'
                     tuples.append(buf.strip())
                     buf = ''
             elif c == ',' and paren_level == 0:
-                # top-level comma between tuples, ignore
                 buf = ''
     if buf.strip():
         tuples.append(buf.strip())
 
-    # Construct single-tuple INSERTs
     single_inserts = []
     for t in tuples:
         single_inserts.append(f"{columns_part} VALUES {t};")
@@ -92,7 +87,6 @@ def extract_inserts(file_path):
                         paren_level -= 1
                     elif c == ';' and paren_level == 0:
                         statement = ''.join(stmt_lines).strip()
-                        # Remove leading comment lines for detection
                         lines = statement.splitlines()
                         while lines and lines[0].strip().startswith('--'):
                             lines.pop(0)
@@ -102,7 +96,6 @@ def extract_inserts(file_path):
                             inserts.extend(split_statements)
                         stmt_lines = []
 
-    # Catch dangling statement at end of file
     if stmt_lines:
         statement = ''.join(stmt_lines).strip()
         lines = statement.splitlines()
@@ -137,7 +130,6 @@ def process_folder(base_folder):
                     out.write('\n\n-- STATEMENT END --\n\n'.join(inserts))
                 print(f"  -> Output written to {out_name}")
 
-            # Move original file to archive
             shutil.move(full_path, os.path.join(archive_dir, filename))
 
 
@@ -148,4 +140,5 @@ if __name__ == "__main__":
 
     folder = sys.argv[1]
     process_folder(folder)
+
 
