@@ -117,7 +117,7 @@ def extract_inserts(file_path):
 
 
 def process_folder(base_folder):
-    done_dir = os.path.join(base_folder, "done")
+    done_dir = os.path.join(base_folder, "insertscripts")
     archive_dir = os.path.join(base_folder, "archive")
     os.makedirs(done_dir, exist_ok=True)
     os.makedirs(archive_dir, exist_ok=True)
@@ -148,3 +148,4 @@ if __name__ == "__main__":
 
     folder = sys.argv[1]
     process_folder(folder)
+
