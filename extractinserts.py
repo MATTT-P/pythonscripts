@@ -4,10 +4,9 @@ import re
 import shutil
 import sys
 
-# Regex to detect start of INSERT
 insert_start_re = re.compile(r'^\s*INSERT\b', re.I)
 delimiter_re = re.compile(r'^\s*DELIMITER\s+(.+)$', re.I)
-dollar_open_re = re.compile(r'\$[A-Za-z0-9_]*\$')  # for PostgreSQL bodies
+dollar_open_re = re.compile(r'\$[A-Za-z0-9_]*\$') 
 
 def extract_inserts(file_path):
     """
@@ -24,13 +23,11 @@ def extract_inserts(file_path):
         for raw_line in f:
             line = raw_line
 
-            # Handle delimiter change
             m = delimiter_re.match(line)
             if m:
                 current_delim = m.group(1)
                 continue
 
-            # If not recording, check for INSERT start
             if not recording:
                 if insert_start_re.match(line):
                     recording = True
@@ -39,16 +36,13 @@ def extract_inserts(file_path):
                 else:
                     continue
             else:
-                # Append lines while recording
                 accum.append(line)
 
-                # Inside dollar-quoted block?
                 if dollar_tag:
                     if dollar_tag in line and line.count(dollar_tag) % 2 == 1:
                         dollar_tag = None
                     continue
 
-                # Opening new dollar-quote
                 d = dollar_open_re.search(line)
                 if d:
                     dollar_tag = d.group(0)
@@ -56,7 +50,6 @@ def extract_inserts(file_path):
                         dollar_tag = None
                     continue
 
-                # Statement termination
                 if line.rstrip().endswith(current_delim):
                     if current_delim != ';':
                         accum[-1] = accum[-1].rstrip()
@@ -70,7 +63,6 @@ def extract_inserts(file_path):
                     dollar_tag = None
                     continue
 
-    # Catch dangling statement
     if recording and accum:
         stmt = ''.join(accum).rstrip()
         statements.append(stmt)
@@ -97,7 +89,6 @@ def process_folder(base_folder):
                     out.write("\n\n-- STATEMENT END --\n\n".join(inserts))
                 print(f"  -> Extracted {len(inserts)} INSERT statements into {out_name}")
 
-            # Move original file to archive
             shutil.move(full_path, os.path.join(archive_dir, filename))
 
 
@@ -108,4 +99,5 @@ if __name__ == "__main__":
 
     folder = sys.argv[1]
     process_folder(folder)
+
 
