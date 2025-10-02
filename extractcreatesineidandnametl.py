@@ -4,12 +4,10 @@ import re
 import shutil
 import sys
 
-# Regex to detect CREATE statements
 create_start_re = re.compile(r'^\s*(CREATE(\s+OR\s+REPLACE)?\b)', re.I)
 delimiter_re = re.compile(r'^\s*DELIMITER\s+(.+)$', re.I)
 dollar_open_re = re.compile(r'\$[A-Za-z0-9_]*\$') 
 
-# Only extract tables in this list
 ALLOWED_TABLES = {'customer', 'call_outcome'}
 
 def extract_creates(file_path):
@@ -156,3 +154,4 @@ if __name__ == "__main__":
 
     folder = sys.argv[1]
     process_folder(folder)
+
