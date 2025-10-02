@@ -110,7 +110,7 @@ def rewrite_create(statement: str) -> str:
 
 
 def process_folder(base_folder):
-    done_dir = os.path.join(base_folder, "done")
+    done_dir = os.path.join(base_folder, "createscripts")
     archive_dir = os.path.join(base_folder, "archive")
     os.makedirs(done_dir, exist_ok=True)
     os.makedirs(archive_dir, exist_ok=True)
